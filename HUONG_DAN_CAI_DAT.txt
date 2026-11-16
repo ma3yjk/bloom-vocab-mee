@@ -1,0 +1,56 @@
+BLOOM VOCAB — BẢN CẬP NHẬT
+
+1. CÁC TỆP
+- index.html: giao diện và chức năng website.
+- config.js: cấu hình kết nối Supabase.
+- supabase_setup.sql: tạo bảng, chủ đề mẫu, phân quyền và kho ảnh.
+
+2. CHẠY THỬ
+Mở index.html bằng Chrome. Khi chưa cấu hình Supabase, website chạy chế độ xem thử với 15 từ mẫu và 7 chủ đề. Dữ liệu thêm ở chế độ xem thử chỉ nằm trên thiết bị, không đồng bộ cộng đồng.
+
+3. TẠO CƠ SỞ DỮ LIỆU SUPABASE
+- Tạo một dự án Supabase mới.
+- Mở SQL Editor > New query.
+- Sao chép TOÀN BỘ nội dung supabase_setup.sql vào đó rồi nhấn Run.
+- Script tạo bảng profiles, topics, words, các chính sách bảo mật RLS, bucket ảnh vocab-images và 15 từ mẫu.
+- Nếu đã từng chạy một bản SQL cũ, chạy bản SQL cập nhật này để bổ sung cấu hình Storage.
+
+4. CẤU HÌNH config.js
+- Trong Supabase, mở Settings > API Keys để sao chép Publishable key (bắt đầu sb_publishable_...).
+- Sao chép API URL gốc của dự án. Nếu API URL có đuôi /rest/v1/ thì xóa phần /rest/v1/ ở cuối.
+- URL cần có dạng https://PROJECT_REF.supabase.co
+- Mở config.js, thay YOUR_SUPABASE_PROJECT_URL và YOUR_SUPABASE_PUBLISHABLE_KEY bằng giá trị thật.
+- Chỉ dùng Publishable key hoặc anon public key. TUYỆT ĐỐI không đưa Secret key, service_role key hoặc mật khẩu database vào website.
+
+5. ĐĂNG NHẬP GOOGLE
+- Supabase > Authentication > Sign In / Providers > Google: bật Google provider.
+- Cấu hình OAuth Client ID và Client Secret theo hướng dẫn hiện trên Supabase.
+- Trong Authentication > URL Configuration, thêm URL GitHub Pages của website vào Site URL/Redirect URLs.
+- Khi website kết nối, người dùng đăng nhập Google để đóng góp từ và tải ảnh.
+
+6. CẤP QUYỀN QUẢN TRỊ
+- Đăng nhập Google bằng tài khoản của bạn trên website lần đầu.
+- Supabase > Authentication > Users, sao chép UID tài khoản.
+- Mở SQL Editor, thay YOUR_USER_UUID bằng UID thật và chạy lệnh riêng:
+  update public.profiles set role = 'admin' where id = 'YOUR_USER_UUID';
+- Chỉ admin mới sửa/xóa từ, thêm/xóa chủ đề và xóa ảnh trong Storage. Không cấp quyền admin bằng cách sửa giao diện.
+
+7. ĐƯA LÊN GITHUB PAGES
+- Upload index.html, config.js, supabase_setup.sql và file hướng dẫn vào thư mục gốc repository.
+- Vào Settings > Pages > Deploy from a branch > main > /(root) > Save.
+- Chờ GitHub Pages xuất bản. Sau mỗi lần sửa file, mở lại website; nếu chưa thấy bản mới, dùng nút tải lại trang hoặc mở cửa sổ ẩn danh.
+
+8. CHỨC NĂNG
+- Kho từ: tìm kiếm và lọc chủ đề.
+- Thêm từ: từ tiếng Anh, phiên âm, nghĩa, ví dụ, chọn ảnh từ máy tính/điện thoại hoặc dán URL ảnh.
+- Ảnh tải lên được lưu trong Supabase Storage bucket vocab-images; giới hạn 5 MB, định dạng JPG/PNG/WEBP/GIF.
+- Học từ bằng flashcard, có thể chọn một chủ đề hoặc tất cả chủ đề.
+- Bài tập chọn nghĩa đúng theo chủ đề.
+- Trò chơi điền chữ còn thiếu và chọn hình minh họa theo chủ đề.
+- Phát âm tiếng Anh bằng giọng đọc trình duyệt; âm thanh vui khi trả lời đúng.
+- Khách có thể xem/học công khai; thành viên đăng nhập có thể đóng góp; chỉ admin được sửa/xóa và quản lý chủ đề.
+
+9. LƯU Ý
+- Website không tự tìm ảnh trên Internet. Người dùng tải ảnh lên hoặc cung cấp đường dẫn ảnh.
+- Ảnh và dữ liệu cộng đồng chỉ đồng bộ khi Supabase đã cấu hình đúng và SQL đã chạy thành công.
+- Google OAuth phải được cấu hình riêng trước khi đăng nhập hoạt động.
