@@ -110,4 +110,17 @@ async function loadData(){if(!supabase){demoData();render();return;}let [tr,wr]=
 async function loadProfile(){if(!supabase)return;let {data:{session}}=await supabase.auth.getSession();user=session?.user||null;isAdmin=false;if(user){let {data}=await supabase.from('profiles').select('role').eq('id',user.id).maybeSingle();isAdmin=data?.role==='admin';}$('authStatus').textContent=user?(user.email||'Đã đăng nhập'):'Chưa đăng nhập';$('loginBtn').textContent=user?'Đăng xuất':'Đăng nhập Google';$('loginBtn').onclick=async()=>{if(user){await supabase.auth.signOut();location.reload();}else{let {error}=await supabase.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(error)notify(error.message,false);}};$('adminNav').classList.toggle('hidden',!isAdmin);}
 if(configured){try{const rootUrl=config.url.replace(/\/rest\/v1\/?$/,'').replace(/\/+$/,'');supabase=createClient(rootUrl,config.anonKey);await loadProfile();supabase.auth.onAuthStateChange(async()=>{await loadProfile();await loadData();});await loadData();}catch(e){demoData();render();msg('Không thể khởi tạo Supabase: '+e.message);}}else{demoData();render();msg('Đang ở chế độ xem thử trên thiết bị này. Cần cấu hình Supabase để đồng bộ dữ liệu cộng đồng và đăng nhập Google.');}
 </script>
+  <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(registration => {
+        console.log("Bloom Vocab PWA đã được đăng ký");
+      })
+      .catch(error => {
+        console.error("Lỗi đăng ký PWA:", error);
+      });
+  });
+}
+</script>
 </body></html>
